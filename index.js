@@ -83,6 +83,18 @@ var Client = function(server, socket, room, user) {
 
     // Validation
 
+    // User must be auth'd
+    if (self.user === undefined) {
+      cb('USER_REQUIRED');
+      return;
+    }
+
+    // User must not be muted
+    if (self.server.rooms[self.room].muteList[self.user.uname.toLowerCase()]) {
+      cb('USER_MUTED');
+      return;
+    }
+
     if (typeof text !== 'string') {
       self.socket.emit('client_error',
                        '`new_message` requires string as first argument');

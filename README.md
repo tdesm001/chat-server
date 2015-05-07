@@ -87,9 +87,25 @@ If auth is successful, the `data` response will provide you with the necessary i
 - `user_muted`: Sent when a user is muted. Payload is an object: `{ uname: String, mins: Integer (duration in minutes), expires_at: String (ISO timestamp) }`.
 - `user_unmuted`: Sent when a user is unmuted. Payload is an object: `{ uname: String }`.
 - `new_message`: Sent when the chat receives a new message. Payload is an object: `{ user: { uname: String, role: String }, id: Integer, text: String }`.
-    - Errors:
-        - `"USER_NOT_ON_MUTELIST"`
-        - `"INVALID_UNMUTE_COMMAND"`
-        - `"INVALID_MUTE_COMMAND"`
-        - `"INTERNAL_ERROR"`
 - `client_error`: Payload is a String. This event is emitted with a human-/developer-friendly error message any time your client disobeys the API. In other words, a client that complies with the chat-server API should never receive this event, but you should listen for it to help catch any client errors and bugs.
+
+## Sending a new chat message
+
+- `text` is a string. Must be 1-140 characters. You should `text.trim()` before sending.
+
+``` javascript
+socket.emit('new_message', text, function(err) {
+  if (err) {
+    ...
+  }
+});
+```
+
+If `err` is present, it will be a string. Possible constants:
+
+- `"USER_NOT_ON_MUTELIST"`
+- `"USER_REQUIRED"`
+- `"USER_MUTED"`
+- `"INVALID_UNMUTE_COMMAND"`
+- `"INVALID_MUTE_COMMAND"`
+- `"INTERNAL_ERROR"`
