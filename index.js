@@ -403,7 +403,6 @@ io.on('connect', function(socket) {
 
         // if hash didn't resolve to user, create client without user
         if (typeof user !== 'object') {
-          cb('INVALID_TOKEN');
           //socket.emit('client_error', 'INVALID_TOKEN');
           server.addClient(new Client(server, socket, room));
           return;
