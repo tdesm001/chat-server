@@ -79,21 +79,6 @@ var Client = function(server, socket, room, user) {
     io.to(self.room).emit(event, data);
   };
 
-  // Send init payload to sync/catchup client
-  // this.socket.emit('init', {
-  //   user: this.user,
-  //   room: this.server.rooms[this.room]
-  // });
-
-  // TODO: Try above
-  this.sendInit = function() {
-    debug('[Client#sendInit]', self.server.rooms[self.room]);
-    self.socket.emit('init', {
-      user: self.user,
-      room: self.server.rooms[self.room]
-    });
-  };
-
   this.socket.on('new_message', function(text, cb) {
 
     // Validation
@@ -220,7 +205,7 @@ var Server = function() {
     );
   }, 5000);
 
-  this.addClient = function(client) {
+  this.addClient = function(client, cb) {
     debug('[server] adding client. room pre-add: %j', self.rooms[client.room]);
 
     // Create room if it doesn't yet exist
@@ -271,8 +256,14 @@ var Server = function() {
 
     this.clients[client.socket.id] = client;
 
-    // State configured, so now send client the `init` payload
-    client.sendInit();
+    // State configured, so now send initialization payload to the
+    // client's `auth` callback.
+    var initPayload = {
+      user: client.user,
+      room: self.rooms[client.room]
+    };
+    cb(null, initPayload);
+
   };
 
   this.removeSocket = function(socket) {
@@ -389,7 +380,7 @@ io.on('connect', function(socket) {
       // if hash not given, then create client without user
       if (typeof data.token_hash !== 'string') {
         debug('no token_hash given');
-        server.addClient(new Client(server, socket, room));
+        server.addClient(new Client(server, socket, room), cb);
         return;
       }
 
@@ -403,13 +394,12 @@ io.on('connect', function(socket) {
 
         // if hash didn't resolve to user, create client without user
         if (typeof user !== 'object') {
-          //socket.emit('client_error', 'INVALID_TOKEN');
-          server.addClient(new Client(server, socket, room));
+          server.addClient(new Client(server, socket, room), cb);
           return;
         }
 
         // User found, so create client with user
-        server.addClient(new Client(server, socket, room, user));
+        server.addClient(new Client(server, socket, room, user), cb);
       });
     });
 
