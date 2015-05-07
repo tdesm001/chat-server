@@ -95,13 +95,16 @@ var Client = function(server, socket, room, user) {
       return;
     }
 
+    // text required
     if (typeof text !== 'string') {
       self.socket.emit('client_error',
                        '`new_message` requires string as first argument');
       return;
     }
 
-    if (text.length >= 140) {
+    text = text.trim();
+
+    if (1 > text.length >= 140) {
       self.socket.emit('client_error', '`new_message` text must be 1-140 chars');
       return;
     }
@@ -113,7 +116,6 @@ var Client = function(server, socket, room, user) {
 
     // Validation success
 
-    text = text.trim();
     debug('[client] new_message:', text);
 
     var textWasCommand;
