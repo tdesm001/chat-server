@@ -84,17 +84,18 @@ var Client = function(server, socket, room, user) {
     // Validation
 
     if (typeof text !== 'string') {
-      self.socket.emit('client_error', 'new_message requires string as first arg');
+      self.socket.emit('client_error',
+                       '`new_message` requires string as first argument');
       return;
     }
 
     if (text.length >= 140) {
-      self.socket.emit('client_error', 'text must be 1-140 chars');
+      self.socket.emit('client_error', '`new_message` text must be 1-140 chars');
       return;
     }
 
     if (cb && typeof cb !== 'function') {
-      self.socket.emit('client_error', 'callback must be a function');
+      self.socket.emit('client_error', '`new_message` requires a callback');
       return;
     }
 
@@ -107,7 +108,6 @@ var Client = function(server, socket, room, user) {
 
     if (text.startsWith('/unmute')) {
       textWasCommand = true;
-      console.log('starts with /unmute');
       let unmuteRegexp = /^\/unmute ([a-z0-9_]+)$/i;
 
       // TODO: Validate uname
@@ -122,16 +122,16 @@ var Client = function(server, socket, room, user) {
         let uname = match[1];
         // Check if uname is muted
         if (self.server.rooms[self.room].muteList[uname.toLowerCase()]) {
-          debug('valid unmute - removing from mutelist');
           delete self.server.rooms[self.room].muteList[uname.toLowerCase()];
           self.broadcast('user_unmuted', { uname: uname.toLowerCase() });
+          return;
         } else {
-          debug('valid unmute - but uname wasnt on mutelist');
-          // uname isn't on mutelist
-          self.socket.emit('client_error', 'USER_NOT_MUTED');
+          cb('USER_NOT_ON_MUTELIST');
+          return;
         }
       } else {
-        debug('invalid unmute');
+        cb('INVALID_UNMUTE_COMMAND');
+        return;
       }
     }
 
@@ -151,30 +151,33 @@ var Client = function(server, socket, room, user) {
           mins: mins,
           expires_at: date
         };
-        self.server.rooms[self.room].muteList[uname] = muteObj
+        self.server.rooms[self.room].muteList[uname] = muteObj;
         debug('muteList is now:', self.server.rooms[self.room].muteList);
-        // TODO: Handle this on client
         self.broadcast('user_muted', muteObj);
+        return;
       } else {
-        // Mute attempt failed
-        self.socket.emit('command_error', 'Mute syntax: /mute username minutes');
+        cb('INVALID_MUTE_COMMAND');
+        return;
       }
     }
 
     if (!textWasCommand) {
       self.server.insertMessage(self.room, self.user, text, function(err, message) {
         if (err) {
-          throw new Error(err);
+          cb('INTERNAL_ERROR');
+          return;
         }
+
         self.broadcast('new_message', message);
+
+        // Let user know the message was inserted successfully
+        if (cb) {
+          cb();
+          return;
+        }
       });
     }
 
-    // Execute callback if it was given. Client can use this to
-    // know when the server processed the event.
-    if (cb) {
-      cb();
-    }
   });
 
 };
