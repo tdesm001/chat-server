@@ -73,3 +73,12 @@ If auth is successful, the `data` response will provide you with the necessary i
   }
 }
 ```
+
+## Events to listen for
+
+- `user_joined`
+- `user_left`
+- `user_muted`
+- `user_unmuted`
+- `new_message`
+- `client_error`
