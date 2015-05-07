@@ -74,6 +74,12 @@ If auth is successful, the `data` response will provide you with the necessary i
 }
 ```
 
+`auth` callback error constants:
+
+- `"INTERNAL_ERROR"`: There was a problem talking to Moneypot's API.
+- There are no other possible errors. If you don't send an `app_id`, then you'll get a `client_error` event and you need to fix your client. If you send an invalid `token_hash`, then you simply get the auth payload back without a user key.
+
+
 ## Events to listen for
 
 - `user_joined`
@@ -81,4 +87,4 @@ If auth is successful, the `data` response will provide you with the necessary i
 - `user_muted`
 - `user_unmuted`
 - `new_message`
-- `client_error`
+- `client_error`: This event is emitted with a human-/developer-friendly error message (String) any time your client disobeys the API. In other words, a client that complies with the chat-server API should never receive this event, but you should listen for it to help catch any client errors and bugs.

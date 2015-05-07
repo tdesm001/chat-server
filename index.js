@@ -342,19 +342,19 @@ io.on('connect', function(socket) {
 
     // Auth must provide object payload
     if (typeof data !== 'object') {
-      cb('auth data required');
+      socket.emit('client_error', 'must send data object with `auth` event');
       return;
     }
 
     // Auth must provide app_id
     if (typeof data.app_id !== 'number') {
-      cb('must provide app_id integer');
+      socket.emit('client_error', 'must send app_id integer with `auth` event');
       return;
     }
 
     if (typeof cb !== 'function') {
       // Emit to socket since they didn't provide a callback
-      socket.emit('client_error', 'must provide callback for auth event');
+      socket.emit('client_error', 'must provide callback to `auth` event');
       return;
     }
 
@@ -369,8 +369,7 @@ io.on('connect', function(socket) {
 
       // If client doesn't give us
       if (!app) {
-        // socket.emit('client_error', 'APP_NOT_FOUND');
-        cb('app not found with that app_id');
+        socket.emit('client_error', 'no app found with the app_id you sent to `auth` event');
         return;
       }
 
