@@ -82,9 +82,9 @@ If auth is successful, the `data` response will provide you with the necessary i
 
 ## Events to listen for
 
-- `user_joined`
-- `user_left`
-- `user_muted`
-- `user_unmuted`
-- `new_message`
-- `client_error`: This event is emitted with a human-/developer-friendly error message (String) any time your client disobeys the API. In other words, a client that complies with the chat-server API should never receive this event, but you should listen for it to help catch any client errors and bugs.
+- `user_joined`: Sent when a user joins the chat. Payload is an object: `{ uname: String, role: 'admin' | 'mod' | 'owner' }`.
+- `user_left`: Sent when a user leaves the chat. Payload is an object: `{ uname: String, role: 'admin' | 'mod' | 'owner' }`.
+- `user_muted`: Sent when a user is muted. Payload is an object: `{ uname: String, mins: Integer (duration in minutes), expires_at: String (ISO timestamp) }`.
+- `user_unmuted`: Sent when a user is unmuted. Payload is an object: `{ uname: String }`.
+- `new_message`: Sent when the chat receives a new message. Payload is an object: `{ user: { uname: String, role: String }, id: Integer, text: String }`.
+- `client_error`: Payload is a String. This event is emitted with a human-/developer-friendly error message any time your client disobeys the API. In other words, a client that complies with the chat-server API should never receive this event, but you should listen for it to help catch any client errors and bugs.
