@@ -88,6 +88,7 @@ If auth is successful, the `data` response will provide you with the necessary i
 - `user_unmuted`: Sent when a user is unmuted. Payload is an object: `{ uname: String }`.
 - `new_message`: Sent when the chat receives a new message. Payload is an object: `{ user: { uname: String, role: String }, id: Integer, text: String }`.
 - `client_error`: Payload is a String. This event is emitted with a human-/developer-friendly error message any time your client disobeys the API. In other words, a client that complies with the chat-server API should never receive this event, but you should listen for it to help catch any client errors and bugs.
+- `system_message`: Payload is string. Sent as server feedback to the user. For example, if they type in `/mute foo 10`, the server will send this event with the message `"foo was muted for 10 min"`.
 
 ## Sending a new chat message
 
@@ -103,9 +104,7 @@ socket.emit('new_message', text, function(err) {
 
 If `err` is present, it will be a string. Possible constants:
 
-- `"USER_NOT_ON_MUTELIST"`
 - `"USER_REQUIRED"`
-- `"USER_MUTED"`
-- `"INVALID_UNMUTE_COMMAND"`
-- `"INVALID_MUTE_COMMAND"`
 - `"INTERNAL_ERROR"`
+
+The server will send feedback to the user via a `system_message` event with a string payload. Examples: `"User not in mutelist"`, `"User muted"`. These are intended to be displayed in the chatbox.

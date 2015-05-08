@@ -91,7 +91,7 @@ var Client = function(server, socket, room, user) {
 
     // User must not be muted
     if (self.server.rooms[self.room].muteList[self.user.uname.toLowerCase()]) {
-      cb('USER_MUTED');
+      self.broadcast('system_message', 'User muted');
       return;
     }
 
@@ -138,13 +138,14 @@ var Client = function(server, socket, room, user) {
         if (self.server.rooms[self.room].muteList[uname.toLowerCase()]) {
           delete self.server.rooms[self.room].muteList[uname.toLowerCase()];
           self.broadcast('user_unmuted', { uname: uname.toLowerCase() });
+          self.socket.emit('system_message', 'User "'+ uname.toLowerCase() +'" unmuted');
           return;
         } else {
-          cb('USER_NOT_ON_MUTELIST');
+          self.socket.emit('system_message', 'User "'+ uname.toLowerCase() +'" not in mutelist');
           return;
         }
       } else {
-        cb('INVALID_UNMUTE_COMMAND');
+        self.socket.emit('system_message', 'Invalid unmute command');
         return;
       }
     }
@@ -170,7 +171,7 @@ var Client = function(server, socket, room, user) {
         self.broadcast('user_muted', muteObj);
         return;
       } else {
-        cb('INVALID_MUTE_COMMAND');
+        self.socket.emit('system_message', 'Invalid mute command');
         return;
       }
     }
