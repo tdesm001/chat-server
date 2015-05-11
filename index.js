@@ -7,6 +7,13 @@ var io = require('socket.io')(http);
 var request = require('request');
 var _ = require('lodash');
 
+var config = {
+  port:         process.env.PORT || 3001,
+  api_endpoint: process.env.API_ENDPOINT || 'https://api.moneypot.com/v1',
+  app_id:       process.env.APP_ID || 1007,
+  app_secret:   process.env.APP_SECRET || '3fc58b9e-3426-4705-9ad8-85ca32603d4b'
+};
+
 var MoneyPot = function(opts) {
   this.endpoint = opts.endpoint;
   this.app_id = opts.app_id;
@@ -45,9 +52,9 @@ var MoneyPot = function(opts) {
 };
 
 var api = new MoneyPot({
-  endpoint: 'http://localhost:3000/v1',
-  app_id: 1007,
-  app_secret: '3fc58b9e-3426-4705-9ad8-85ca32603d4b'
+  endpoint:   config.api_endpoint,
+  app_id:     config.app_id,
+  app_secret: config.app_secret
 });
 
 var Client = function(server, socket, room, user) {
@@ -433,5 +440,4 @@ io.on('connect', function(socket) {
   });
 });
 
-const port = process.env.PORT || 3001;
-http.listen(port, () => console.log('Listening on', port));
+http.listen(config.port, () => console.log('Listening on', config.port));
