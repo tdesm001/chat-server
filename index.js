@@ -91,7 +91,7 @@ var Client = function(server, socket, room, user) {
 
     // User must not be muted
     if (self.server.rooms[self.room].muteList[self.user.uname.toLowerCase()]) {
-      self.broadcast('system_message', 'User muted');
+      self.socket.emit('system_message', 'You are muted');
       return;
     }
 
@@ -114,14 +114,19 @@ var Client = function(server, socket, room, user) {
       return;
     }
 
+    let textIsCommand = text.startsWith('/mute') || text.startsWith('/unmute');
+
+    // Ensure user is authorized to send the command
+    if (textIsCommand && !_.contains(['admin', 'owner', 'mod'], self.user.role)) {
+      self.socket.emit('system_message', 'You are not authorized to do that');
+      return;
+    }
+
     // Validation success
 
     debug('[client] new_message:', text);
 
-    var textWasCommand;
-
     if (text.startsWith('/unmute')) {
-      textWasCommand = true;
       let unmuteRegexp = /^\/unmute ([a-z0-9_]+)$/i;
 
       // TODO: Validate uname
@@ -152,7 +157,6 @@ var Client = function(server, socket, room, user) {
 
     // TODO: Ensure user is owner/mod/admin
     if (text.startsWith('/mute')) {
-      textWasCommand = true;
       console.log('starts with /mute');
       if (/\/mute [a-z0-9_]+ [\d]+/.test(text)) {
         // Mute
@@ -169,6 +173,7 @@ var Client = function(server, socket, room, user) {
         self.server.rooms[self.room].muteList[uname] = muteObj;
         debug('muteList is now:', self.server.rooms[self.room].muteList);
         self.broadcast('user_muted', muteObj);
+        self.socket.emit('system_message', 'User "'+ uname +'" muted for '+ mins +' minutes');
         return;
       } else {
         self.socket.emit('system_message', 'Invalid mute command');
@@ -176,7 +181,7 @@ var Client = function(server, socket, room, user) {
       }
     }
 
-    if (!textWasCommand) {
+    if (!textIsCommand) {
       self.server.insertMessage(self.room, self.user, text, function(err, message) {
         if (err) {
           cb('INTERNAL_ERROR');
