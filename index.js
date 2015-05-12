@@ -111,7 +111,7 @@ var Client = function(server, socket, room, user) {
 
     text = text.trim();
 
-    if (1 > text.length >= 140) {
+    if (text.length < 1 || text.length > 140) {
       self.socket.emit('client_error', '`new_message` text must be 1-140 chars');
       return;
     }
