@@ -246,16 +246,7 @@ var Server = function() {
         muteList: {},
         users: {},
         clients: {},
-        history: [
-          {
-            id: 42,
-            user: {
-              uname: 'test_owner',
-              role: 'owner'
-            },
-            text: ':)'
-          }
-        ]
+        history: []
       };
     }
 
