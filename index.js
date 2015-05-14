@@ -15,6 +15,14 @@ var config = {
   app_secret:   process.env.APP_SECRET || '3fc58b9e-3426-4705-9ad8-85ca32603d4b'
 };
 
+// Returns a room where the history cbuffer is converted into an array
+// for clients.
+var presentRoom = function(room) {
+  var tmp = _.clone(room);
+  tmp.history = room.history.toArray();
+  return tmp;
+};
+
 var MoneyPot = function(opts) {
   this.endpoint = opts.endpoint;
   this.app_id = opts.app_id;
@@ -282,7 +290,7 @@ var Server = function() {
     // client's `auth` callback.
     var initPayload = {
       user: client.user,
-      room: self.rooms[client.room]
+      room: presentRoom(self.rooms[client.room])
     };
     cb(null, initPayload);
 
