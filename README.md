@@ -10,18 +10,20 @@ Our chat-server is running on `https://a-chat-server.herokuapp.com`.
 
 Here's how to connect:
 
-    <script src="vendor/javascript/socket.io-client.js"></script>
-    <script type="text/javascript">
-      var socket = io('https://a-chat-server.herokuapp.com');
+``` javascript
+<script src="vendor/javascript/socket.io-client.js"></script>
+<script type="text/javascript">
+  var socket = io('https://a-chat-server.herokuapp.com');
 
-      socket.emit('connect', function() {
-        console.log('socket connected');
-      });
+  socket.emit('connect', function() {
+    console.log('socket connected');
+  });
 
-      socket.emit('disconnect', function() {
-        console.log('socket disconnected');
-      });
-    </script>
+  socket.emit('disconnect', function() {
+    console.log('socket disconnected');
+  });
+</script>
+```
 
 When you connect to that chat server, immediately send an "auth" event with this payload:
 
