@@ -136,8 +136,12 @@ The server will send feedback to the user via a `system_message` event with a st
 
 Here's a fully working chat-server client that may help you get started.
 
-``` javascript
+The `CryptoJS.SHA256` function depends on this:
 
+``` javascript
+<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js" type="text/javascript"></script>
+
+<script type="text/javascript">
 var config = {
   chat_uri: 'https://a-chat-server.herokuapp.com',
   access_token: undefined,
@@ -213,5 +217,6 @@ socket.on('connect', function() {
 
   });
 });
+</script>
 
 ```
