@@ -34,6 +34,8 @@ When you connect to that chat server, immediately send an "auth" event with this
 }
 ```
 
+
+
 For example:
 
 ``` javascript
@@ -46,7 +48,7 @@ socket.emit('connect', function() {
 
 The chat server will automatically subscribe you to the app's lobby channel.
 
-`token_hash` is `sha256(access_token)`. It represents a logged-in user. If missing or if the token_hash is invalid, then the socket will only be able to read new messages and will not be able to create any messages.
+`token_hash` is `sha256` of either the `confidential_token` or `access_token)` (depending if the app is using confidential flow or implicit flow). In the case of confidential_flow, the `token_hash` should be computed by the server, and sent to the client, which will use it for login. If the `token_hash` is valid, it represents a logged-in user. If missing or if the token_hash is invalid, then the socket will only be able to read new messages and will not be able to create any messages. 
 
 You must also provide a callback with signature `fn(err, data)`.
 
@@ -137,12 +139,11 @@ The server will send feedback to the user via a `system_message` event with a st
 Here's a fully working chat-server client that may help you get started.
 
 ``` javascript
-<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js" type="text/javascript"></script>
 
 <script type="text/javascript">
   var config = {
     chat_uri: 'https://a-chat-server.herokuapp.com',
-    access_token: undefined,
+    hashed_token: '5fef422fb4e79a1785868b87abb3d3932ea5621c23ab2e9b13ee2167f12542cb', // See section above about hashed tokens
     app_id: 2
   };
 
@@ -188,12 +189,8 @@ Here's a fully working chat-server client that may help you get started.
     // Once we connect to chat server, we send an auth message to join
     // this app's lobby channel.
 
-    // A hash of the current user's accessToken is only sent if you have one
-    var tokenHash;
-    if (config.access_token) {
-      tokenHash =  CryptoJS.SHA256(config.access_token).toString();
-    }
-    var authPayload = { app_id: config.app_id, token_hash: tokenHash};
+
+    var authPayload = { app_id: config.app_id, token_hash: config.hashed_token};
     socket.emit('auth', authPayload, function(err, data) {
       if (err) {
         console.log('[socket] Auth failure:', err);
