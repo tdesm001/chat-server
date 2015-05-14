@@ -30,7 +30,7 @@ When you connect to that chat server, immediately send an "auth" event with this
 ``` javascript
 {
   app_id: Integer,   (Required)
-  token_hash: String (Optional)
+  hashed_token: String (Optional)
 }
 ```
 
@@ -48,7 +48,7 @@ socket.emit('connect', function() {
 
 The chat server will automatically subscribe you to the app's lobby channel.
 
-`token_hash` is `sha256` of either the `confidential_token` or `access_token)` (depending if the app is using confidential flow or implicit flow). In the case of confidential_flow, the `token_hash` should be computed by the server, and sent to the client, which will use it for login. If the `token_hash` is valid, it represents a logged-in user. If missing or if the token_hash is invalid, then the socket will only be able to read new messages and will not be able to create any messages. 
+`hashed_token` is `sha256` of either the `confidential_token` or `access_token)` (depending if the app is using confidential flow or implicit flow). In the case of confidential_flow, the `hashed_token` should be computed by the server, and sent to the client, which will use it for login. If the `hashed_token` is valid, it represents a logged-in user. If missing or if the hashed_token is invalid, then the socket will only be able to read new messages and will not be able to create any messages.
 
 You must also provide a callback with signature `fn(err, data)`.
 
@@ -58,8 +58,8 @@ If auth is successful, the `data` response will provide you with the necessary i
 
 ``` javascript
 {
-  // User of the token_hash you provided
-  // Only exists if token_hash was provided and valid
+  // User of the hashed_token you provided
+  // Only exists if hashed_token was provided and valid
   user: {
     id: 69,
     uname: 'donald',
@@ -102,7 +102,7 @@ If auth is successful, the `data` response will provide you with the necessary i
 `auth` callback error constants:
 
 - `"INTERNAL_ERROR"`: There was a problem talking to Moneypot's API.
-- There are no other possible errors. If you don't send an `app_id`, then you'll get a `client_error` event and you need to fix your client. If you send an invalid `token_hash`, then you simply get the auth payload back without a user key.
+- There are no other possible errors. If you don't send an `app_id`, then you'll get a `client_error` event and you need to fix your client. If you send an invalid `hashed_token`, then you simply get the auth payload back without a user key.
 
 
 ## Events to listen for
@@ -190,7 +190,7 @@ Here's a fully working chat-server client that may help you get started.
     // this app's lobby channel.
 
 
-    var authPayload = { app_id: config.app_id, token_hash: config.hashed_token};
+    var authPayload = { app_id: config.app_id, hashed_token: config.hashed_token};
     socket.emit('auth', authPayload, function(err, data) {
       if (err) {
         console.log('[socket] Auth failure:', err);
