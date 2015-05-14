@@ -6,6 +6,7 @@ var http = require('http').createServer(app.callback());
 var io = require('socket.io')(http);
 var request = require('request');
 var _ = require('lodash');
+var CBuffer = require('CBuffer');
 
 var config = {
   port:         (process.env.PORT && parseInt(process.env.PORT)) || 3001,
@@ -246,7 +247,7 @@ var Server = function() {
         muteList: {},
         users: {},
         clients: {},
-        history: []
+        history: new CBuffer(250)
       };
     }
 
