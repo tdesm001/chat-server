@@ -136,87 +136,85 @@ The server will send feedback to the user via a `system_message` event with a st
 
 Here's a fully working chat-server client that may help you get started.
 
-The `CryptoJS.SHA256` function depends on this:
-
 ``` javascript
 <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-var config = {
-  chat_uri: 'https://a-chat-server.herokuapp.com',
-  access_token: undefined,
-  app_id: 2
-};
+  var config = {
+    chat_uri: 'https://a-chat-server.herokuapp.com',
+    access_token: undefined,
+    app_id: 2
+  };
 
-var socket = io(config.chat_uri);
+  var socket = io(config.chat_uri);
 
-socket.on('connect', function() {
-  console.log('[socket] Connected');
+  socket.on('connect', function() {
+    console.log('[socket] Connected');
 
-  socket.on('disconnect', function() {
-    console.log('[socket] Disconnected');
-  });
+    socket.on('disconnect', function() {
+      console.log('[socket] Disconnected');
+    });
 
-  socket.on('system_message', function(text) {
-    console.log('[socket] Received system message:', text);
-  });
+    socket.on('system_message', function(text) {
+      console.log('[socket] Received system message:', text);
+    });
 
-  // message is { text: String, user: { role: String, uname: String} }
-  socket.on('new_message', function(message) {
-    console.log('[socket] Received chat message:', message);
-  });
+    // message is { text: String, user: { role: String, uname: String} }
+    socket.on('new_message', function(message) {
+      console.log('[socket] Received chat message:', message);
+    });
 
-  socket.on('user_muted', function(data) {
-    console.log('[socket] User muted:', data);
-  });
+    socket.on('user_muted', function(data) {
+      console.log('[socket] User muted:', data);
+    });
 
-  socket.on('user_unmuted', function(data) {
-    console.log('[socket] User unmuted:', data);
-  });
+    socket.on('user_unmuted', function(data) {
+      console.log('[socket] User unmuted:', data);
+    });
 
-  socket.on('user_joined', function(data) {
-    console.log('[socket] User joined:', data);
-  });
+    socket.on('user_joined', function(data) {
+      console.log('[socket] User joined:', data);
+    });
 
-  socket.on('user_left', function(data) {
-    console.log('[socket] User left:', data);
-  });
+    socket.on('user_left', function(data) {
+      console.log('[socket] User left:', data);
+    });
 
-  // Received when your client doesn't comply with chat-server api
-  socket.on('client_error', function(text) {
-    console.warn('[socket] Client error:', text);
-  });
+    // Received when your client doesn't comply with chat-server api
+    socket.on('client_error', function(text) {
+      console.warn('[socket] Client error:', text);
+    });
 
-  // Once we connect to chat server, we send an auth message to join
-  // this app's lobby channel.
+    // Once we connect to chat server, we send an auth message to join
+    // this app's lobby channel.
 
-  // A hash of the current user's accessToken is only sent if you have one
-  var tokenHash;
-  if (config.access_token) {
-    tokenHash =  CryptoJS.SHA256(config.access_token).toString();
-  }
-  var authPayload = { app_id: config.app_id, token_hash: tokenHash};
-  socket.emit('auth', authPayload, function(err, data) {
-    if (err) {
-      console.log('[socket] Auth failure:', err);
-      return;
+    // A hash of the current user's accessToken is only sent if you have one
+    var tokenHash;
+    if (config.access_token) {
+      tokenHash =  CryptoJS.SHA256(config.access_token).toString();
     }
-    console.log('[socket] Auth success:', data);
+    var authPayload = { app_id: config.app_id, token_hash: tokenHash};
+    socket.emit('auth', authPayload, function(err, data) {
+      if (err) {
+        console.log('[socket] Auth failure:', err);
+        return;
+      }
+      console.log('[socket] Auth success:', data);
 
-    // If successful auth and if a user is connected to chat, then
-    // send a message:
+      // If successful auth and if a user is connected to chat, then
+      // send a message:
 
-    if (data.user) {
-      socket.emit('new_message', 'Hello, world!', function(err) {
-        console.warn('[socket] err when sending message:', err);
-        return
-      });
+      if (data.user) {
+        socket.emit('new_message', 'Hello, world!', function(err) {
+          console.warn('[socket] err when sending message:', err);
+          return
+        });
 
-      console.log('[socket] Successfully sent message to server');
-    }
+        console.log('[socket] Successfully sent message to server');
+      }
 
+    });
   });
-});
 </script>
 
 ```
