@@ -364,7 +364,7 @@ io.on('connect', function(socket) {
     debug('socket error:', err);
   });
 
-  // data is { app_id: Int, token_hash: Maybe String }
+  // data is { app_id: Int, hashed_token: Maybe String }
   socket.once('auth', function(data, cb) {
     console.log('socket auth:', data);
 
@@ -407,13 +407,13 @@ io.on('connect', function(socket) {
       var room = 'app:' + app.id;
 
       // if hash not given, then create client without user
-      if (typeof data.token_hash !== 'string') {
-        debug('no token_hash given');
+      if (typeof (data.hashed_token || data.token_hash) !== 'string') {
+        debug('no hashed_token given');
         server.addClient(new Client(server, socket, room), cb);
         return;
       }
 
-      api.findUserByTokenHash(data.token_hash, function(err, user) {
+      api.findUserByTokenHash((data.hashed_token || data.token_hash), function(err, user) {
         //if (err) { throw new Error('error:', err); }
         if (err) {
           console.error('[findUserByTokenHash] Error:', err, err.stack);
