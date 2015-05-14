@@ -362,7 +362,7 @@ io.on('connect', function(socket) {
     // Validate
 
     // Auth must provide object payload
-    if (typeof data !== 'object') {
+    if (!_.isPlainObject(data)) {
       socket.emit('client_error', 'must send data object with `auth` event');
       return;
     }
@@ -423,12 +423,14 @@ io.on('connect', function(socket) {
       });
     });
 
+    socket.on('disconnect', function() {
+      debug('[disconnect] socket disconnected');
+      server.removeSocket(socket);
+    });
+
   });
 
-  socket.on('disconnect', function() {
-    debug('[disconnect] socket disconnected');
-    server.removeSocket(socket);
-  });
+
 });
 
 http.listen(config.port, () => console.log('Listening on', config.port));
