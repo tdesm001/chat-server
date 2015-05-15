@@ -177,8 +177,9 @@ Server.prototype.removeSocket = function(socket) {
         // TODO: Need to check if user has any clients *in the room this client just
         // left*
         var aRemainingClient = _.values(this.clients).some(function(c) {
-            return c.user.uname === client.user.uname &&
-                c.room === client.room;
+            return c.user && // not every client has a user, so skip the ones that don't
+                   c.user.uname === client.user.uname &&
+                   c.room === client.room;
         });
 
         if (aRemainingClient) {
