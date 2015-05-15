@@ -16,10 +16,11 @@ var config = {
 };
 
 // Returns a room where the history cbuffer is converted into an array
-// for clients.
+// for clients. Transforms it so it can be broadcast to clients.
 var presentRoom = function(room) {
   var tmp = _.clone(room);
   tmp.history = room.history.toArray();
+  delete tmp.clients;
   return tmp;
 };
 
