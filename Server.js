@@ -59,7 +59,7 @@ Server.prototype.onConnect = function(socket) {
 /**
  * Do client Authentication
  *
- * @param {Object} data - is { app_id: Int, token_hash: Maybe String }
+ * @param {Object} data - is { app_id: Int, hashed_token: Maybe String }
  * @param {function} cb - clients callback(err, data)
  */
 Server.prototype.onAuth = function(socket, data, cb) {
@@ -105,13 +105,13 @@ Server.prototype.onAuth = function(socket, data, cb) {
         var room = 'app:' + app.id;
 
         // if hash not given, then create client without user
-        if (typeof data.token_hash !== 'string') {
-            debug('no token_hash given');
+        if (typeof (data.hashed_token || data.token_hash) !== 'string') {
+            debug('no hashed_token given');
             self.addClient(socket, new Client(self, socket, room), cb);
             return;
         }
 
-        API.findUserByTokenHash(data.token_hash, function(err, user) {
+        API.findUserByTokenHash(data.hashed_token || data.token_hash, function(err, user) {
             //if (err) { throw new Error('error:', err); }
             if (err) {
                 console.error('[findUserByTokenHash] Error:', err, err.stack);
