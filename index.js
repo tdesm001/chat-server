@@ -106,7 +106,12 @@ var Client = function(server, socket, room, user) {
     }
 
     // User must not be muted
-    if (self.server.rooms[self.room].muteList[self.user.uname.toLowerCase()]) {
+    // However, allow owners, staff, and mods to circumvent this
+    // TODO: it would be better to simply prevent /mute from applying to
+    //       these users, but that would require loading the unames of app owners/mods
+    //       Might be better to do that once we refactor apps to have many owners
+    //       and many mods.
+    if (self.server.rooms[self.room].muteList[self.user.uname.toLowerCase()] && !_.contains(['admin', 'mod', 'owner'], self.user.role)) {
       self.socket.emit('system_message', 'You are muted');
       return;
     }
@@ -132,7 +137,7 @@ var Client = function(server, socket, room, user) {
 
     let textIsCommand = text.startsWith('/mute') || text.startsWith('/unmute');
 
-    // Ensure user is authorized to send the command
+    // Ensure user has appropriate role to send commands
     if (textIsCommand && !_.contains(['admin', 'owner', 'mod'], self.user.role)) {
       self.socket.emit('system_message', 'You are not authorized to do that');
       return;
