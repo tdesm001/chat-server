@@ -432,6 +432,11 @@ io.on('connect', function(socket) {
           return;
         }
 
+        // If user owns app, set their role to owner
+        if (_.contains(app.owners, user.uname)) {
+          user.role = 'owner';
+        }
+
         // User found, so create client with user
         server.addClient(new Client(server, socket, room, user), cb);
       });
