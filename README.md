@@ -215,3 +215,7 @@ Here's a fully working chat-server client that may help you get started.
 </script>
 
 ```
+
+## Mention System
+
+Mentioning usernames should be implemented by the client with the format **@username** on any position on the message, the server does not check for usernames on the messsage
