@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const debug = require('debug')('app:client');
 const assert = require('better-assert');
 //const EventEmitter = require('events').EventEmitter;
