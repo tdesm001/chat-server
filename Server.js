@@ -27,19 +27,6 @@ function Server(httpServer) {
     this.io.on('connect', this.onConnect.bind(this));
 
     var self = this;
-    setInterval(function() {
-        debug(
-            '[server heartbeat] client count: %j, user count: %j, unames: %j, rooms: %j',
-            Object.keys(self.clients).length,
-            Object.keys(self.users).length,
-            _.values(self.users).map(function(c) { return c.uname; }),
-            _.values(self.rooms).map(function(r) {
-                var tmp = _.clone(r);
-                delete tmp.history;
-                return tmp;
-            })
-        );
-    }, 5000);
 }
 
 /** Receive the socket and attach listeners */
@@ -111,7 +98,9 @@ Server.prototype.onAuth = function(socket, data, cb) {
             return;
         }
 
-        API.findUserByTokenHash(data.hashed_token || data.token_hash, function(err, user) {
+        // data is either user object or { error: String }
+        // example data: { error: 'INVALID_ACCESS_TOKEN' }
+        API.findUserByTokenHash(data.hashed_token || data.token_hash, function(err, data) {
             //if (err) { throw new Error('error:', err); }
             if (err) {
                 console.error('[findUserByTokenHash] Error:', err, err.stack);
@@ -119,11 +108,14 @@ Server.prototype.onAuth = function(socket, data, cb) {
                 return;
             }
 
-            // if hash didn't resolve to user, create client without user //TODO: isn't it more correct to tell the user that they hash is invalid?
-            if (typeof user !== 'object') {
+            // if hash didn't resolve to user, create client without user
+            //TODO: isn't it more correct to tell the user that they hash is invalid?
+            if (data.error) {
                 self.addClient(socket, new Client(self, socket, room), cb);
                 return;
             }
+
+            var user = data;
 
             // If user owns app, set their role to owner
             if (_.contains(app.owners, user.uname)) {
@@ -216,7 +208,7 @@ Server.prototype.addClient = function(socket, client, cb) {
         };
     }
 
-    debug('room is now: %j', this.rooms[client.room]);
+    // debug('room is now: %j', this.rooms[client.room]);
 
     // TODO:Add client to rooms map
 
