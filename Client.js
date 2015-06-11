@@ -59,8 +59,8 @@ Client.prototype.onNewMessage = function(text, cb) {
 
     text = text.trim();
 
-    if (text.length < 1 || text.length > 140) {
-        this.socket.emit('client_error', '`new_message` text must be 1-140 chars');
+    if (text.length < 1 || text.length > 350) {
+        this.socket.emit('client_error', '`new_message` text must be 1-350 chars');
         return;
     }
 
