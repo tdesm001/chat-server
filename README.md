@@ -117,7 +117,7 @@ If auth is successful, the `data` response will provide you with the necessary i
 
 ## Sending a new chat message
 
-- `text` is a string. Must be 1-140 characters. You should `text.trim()` before sending.
+- `text` is a string. Must be 1-350 characters. You should `text.trim()` before sending.
 
 ``` javascript
 socket.emit('new_message', text, function(err) {
