@@ -154,6 +154,11 @@ Server.prototype.insertMessage = function(roomName, user, text, cb) {
 Server.prototype.removeSocket = function(socket) {
     var client = this.clients[socket.id];
 
+    if (!client) {
+      debug('[removeSocket] Hmm, no client found with socket.id: %j', socket.id);
+      return;
+    }
+
     if (client) {
         debug('[removeSocket] client: %j', client.socket.id);
     } else {
