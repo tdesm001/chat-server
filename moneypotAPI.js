@@ -20,7 +20,16 @@ MoneyPot.prototype.sendAPIRequest = function(method, endpoint, cb) {
             debug('err', err);
             return cb(err);
         }
-        return cb(null, JSON.parse(body));
+
+        // Cloudflare will give HTML page if origin is in error state
+        var parsed;
+        try {
+          parsed = JSON.parse(body);
+        } catch(ex) {
+          return cb(ex);
+        }
+
+        return cb(null, parsed);
     });
 };
 
